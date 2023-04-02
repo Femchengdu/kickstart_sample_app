@@ -1,15 +1,15 @@
 import Web3 from "web3";
 
 let web3;
-try {
-  if (window) {
-    window.ethereum.request({ method: "eth_requestAccounts" });
-    web3 = new Web3(window.ethereum);
-  } else {
-    web3 = {};
-  }
-} catch (error) {
-  console.log("There is a problem with the window object", error.message);
+if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
+  // We are in the browser and metamask is running.
+  window.ethereum.request({ method: "eth_requestAccounts" });
+  web3 = new Web3(window.ethereum);
+} else {
+  // We are on the server *OR* the user is not running metamask
+  const httpProviderLink = process.env.INFURA_KEY;
+  const provider = new Web3.providers.HttpProvider(httpProviderLink);
+  web3 = new Web3(provider);
 }
 
 export default web3;
