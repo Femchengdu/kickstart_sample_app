@@ -7,7 +7,7 @@ let instance;
 if (web3 && web3.eth) {
   instance = new web3.eth.Contract(parsedCFInterface, contractAddress);
 } else {
-  console.log("web3 not active yet", web3);
+  console.log("Web3 is :", typeof web3);
 }
 
 export default instance;
