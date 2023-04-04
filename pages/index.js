@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import factory from "../ethereum/factory";
 import { Card, Button } from "semantic-ui-react";
 import Layout from "../components/Layout";
+
 class CampaignIndex extends Component {
   static async getInitialProps() {
     const campaigns = await factory.methods.getDeployedCampaigns().call();
@@ -11,7 +12,7 @@ class CampaignIndex extends Component {
 
   renderCampaigns() {
     const itemsToMap = this.props.campaigns.length
-      ? this.props.campaigns.length
+      ? this.props.campaigns
       : [`No campaigns yet`];
     const items = itemsToMap.map((address) => {
       return {
