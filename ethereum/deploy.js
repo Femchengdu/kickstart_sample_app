@@ -6,15 +6,8 @@ const factoryByteCode = compiledFactory.bytecode;
 require("dotenv").config();
 const mnemonic = process.env.MNEMONIC;
 const infuraKey = process.env.INFURA_KEY;
-
 const provider = new HDWalletProvider(mnemonic, infuraKey);
 const web3 = new Web3(provider);
-
-// factory = await new web3.eth.Contract(compiledFactoryInterface)
-// .deploy({
-//   data: factoryByteCode,
-// })
-// .send({ from: accounts[0], gas: "1000000" });
 
 const deploy = async () => {
   const fetchedAccounts = await web3.eth.getAccounts();
