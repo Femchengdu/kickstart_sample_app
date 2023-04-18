@@ -1,38 +1,30 @@
 const assert = require("assert");
-const gnache = require("ganache-cli");
+const ganache = require("ganache-cli");
 const Web3 = require("web3");
+const web3 = new Web3(ganache.provider());
+
 const compiledFactory = require("../ethereum/build/CampaignFactory.json");
 const compiledCampaign = require("../ethereum/build/Campaign.json");
-const web3 = new Web3(gnache.provider());
 
 let accounts;
 let factory;
-let campaignAddresss;
+let campaignAddress;
 let campaign;
 
 beforeEach(async () => {
   accounts = await web3.eth.getAccounts();
-  const compiledFactoryInterface = JSON.parse(compiledFactory.interface);
 
-  const factoryByteCode = compiledFactory.bytecode;
-  factory = await new web3.eth.Contract(compiledFactoryInterface)
-    .deploy({
-      data: factoryByteCode,
-    })
-    .send({ from: accounts[0], gas: "1000000" });
+  factory = await new web3.eth.Contract(compiledFactory.abi)
+    .deploy({ data: compiledFactory.evm.bytecode.object })
+    .send({ from: accounts[0], gas: "1400000" });
 
-  await factory.methods
-    .createCampaign("100")
-    .send({ from: accounts[0], gas: "1000000" });
+  await factory.methods.createCampaign("100").send({
+    from: accounts[0],
+    gas: "1000000",
+  });
 
-  [campaignAddresss] = await factory.methods.getDeployedCampaigns().call();
-
-  const compiledCampaignInterface = JSON.parse(compiledCampaign.interface);
-
-  campaign = await new web3.eth.Contract(
-    compiledCampaignInterface,
-    campaignAddresss
-  );
+  [campaignAddress] = await factory.methods.getDeployedCampaigns().call();
+  campaign = await new web3.eth.Contract(compiledCampaign.abi, campaignAddress);
 });
 
 describe("Campaigns", () => {
@@ -62,21 +54,21 @@ describe("Campaigns", () => {
         from: accounts[1],
       });
       assert(false);
-    } catch (error) {
-      assert(error);
+    } catch (err) {
+      assert(err);
     }
   });
 
-  it("allows a manage to make a pyment reuest", async () => {
+  it("allows a manager to make a payment request", async () => {
     await campaign.methods
-      .createRequest("Go on vacation", "100", accounts[1])
+      .createRequest("Buy batteries", "100", accounts[1])
       .send({
         from: accounts[0],
         gas: "1000000",
       });
-
     const request = await campaign.methods.requests(0).call();
-    assert.equal("Go on vacation", request.description);
+
+    assert.equal("Buy batteries", request.description);
   });
 
   it("processes requests", async () => {
