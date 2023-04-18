@@ -1,8 +1,7 @@
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 const Web3 = require("web3");
 const compiledFactory = require("./build/CampaignFactory.json");
-const compiledFactoryInterface = JSON.parse(compiledFactory.interface);
-const factoryByteCode = compiledFactory.bytecode;
+
 require("dotenv").config();
 const mnemonic = process.env.MNEMONIC;
 const infuraKey = process.env.INFURA_KEY;
@@ -17,20 +16,14 @@ const deploy = async () => {
     balance = web3.utils.fromWei(balance, "ether");
     balance = parseFloat(balance);
     console.log("The current balance on the account  ", balance);
-    const result = await new web3.eth.Contract(compiledFactoryInterface)
-      .deploy({
-        data: factoryByteCode,
-      })
-      .send({
-        from: fetchedAccounts[0],
-        gas: "1000000",
-      });
+    const result = await new web3.eth.Contract(compiledFactory.abi)
+      .deploy({ data: compiledFactory.evm.bytecode.object })
+      .send({ gas: "1400000", from: accounts[0] });
+
     console.log("The contract is deployed to.  ", result.options.address);
   } catch (error) {
     console.log("there was the following deply error:", error);
   }
   provider.engine.stop();
 };
-provider.engine.stop();
-
 deploy();
