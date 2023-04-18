@@ -5,14 +5,33 @@ const fs = require("fs-extra");
 const buildPath = path.resolve(__dirname, "build");
 fs.removeSync(buildPath);
 
-const camaignPath = path.resolve(__dirname, "contracts", "Campaign.sol");
-const source = fs.readFileSync(camaignPath, "utf8");
-const output = solc.compile(source).contracts;
+const campaignPath = path.resolve(__dirname, "contracts", "Campaign.sol");
+const source = fs.readFileSync(campaignPath, "utf8");
 
-fs.emptyDirSync(buildPath);
+const input = {
+  language: "Solidity",
+  sources: {
+    "Campaign.sol": {
+      content: source,
+    },
+  },
+  settings: {
+    outputSelection: {
+      "*": {
+        "*": ["*"],
+      },
+    },
+  },
+};
+
+const output = JSON.parse(solc.compile(JSON.stringify(input))).contracts[
+  "Campaign.sol"
+];
+
+fs.ensureDirSync(buildPath);
 
 for (let contract in output) {
-  fs.outputJSONSync(
+  fs.outputJsonSync(
     path.resolve(buildPath, contract.replace(":", "") + ".json"),
     output[contract]
   );
