@@ -24,5 +24,5 @@ and consist of
 ### TODO
 
 - Upgrade the smart contract from the current version of solidity
-- A deeper dive into smart contract testing
+- A deeper dive into smart contract testing.
 - Turning the compile and deploy scripts into reuseable libraries.
